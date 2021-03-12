@@ -1,0 +1,68 @@
+"""
+***************************************************************************
+*   Copyright (c) 2021 Andrew Shkolik                         *
+*                                                                         *
+*   This file is a supplement to the FreeCAD CAx development system.      *
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU Lesser General Public License (LGPL)    *
+*   as published by the Free Software Foundation; either version 2 of     *
+*   the License, or (at your option) any later version.                   *
+*   for detail see the LICENCE text file.                                 *
+*                                                                         *
+*   This software is distributed in the hope that it will be useful,      *
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+*   GNU Library General Public License for more details.                  *
+*                                                                         *
+*   You should have received a copy of the GNU Library General Public     *
+*   License along with this macro; if not, write to the Free Software     *
+*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+*   USA                                                                   *
+***************************************************************************
+*           WARNING! All changes in this file will be lost and            *
+*                  may cause malfunction of the program                   *
+***************************************************************************
+"""
+# This macro can set 3D view parallel to the selected face.
+# Inspired by macro "FCCamera" created by <mario52> 
+# see https://gist.github.com/mario52a/4aa545c23b323cf68824
+# but does only one thing I need 
+# and can be added to the toolbar of a choise
+
+__Name__ = 'AlignViewToFace'
+__Author__ = 'Andrew Shkolik'
+__Version__ = '0.0.01'
+__Date__ = '2021-03-11'
+__License__ = 'LGPL'
+__Web__ = ''
+__Wiki__ = ''
+__Icon__ = ''
+__Help__ = ''
+__Status__ = ''
+__Requires__ = ''
+__Communication__ = ''
+__Files__ = ''
+
+try:
+	p = App.ParamGet("User parameter:BaseApp/Preferences/Macros/FCMmacros/" + __Name__)
+	element = Gui.Selection.getSelectionEx()[0].SubElementNames[0]
+
+	invert = p.GetBool("InvertView")
+
+	if element != p.GetString("PreviousFace"):
+		invert = False
+		p.SetString("PreviousFace",element)
+
+	v = Gui.Selection.getSelectionEx()[0].SubObjects[0].normalAt(0,0)
+	
+	if not invert:
+		r=App.Rotation(App.Vector(0,0,1),v)
+	else:
+		r=App.Rotation(App.Vector(0,0,-1),v)
+
+	Gui.ActiveDocument.ActiveView.setCameraOrientation(r.Q)
+
+	p.SetBool("InvertView", not invert)
+except:
+	App.Console.PrintError("Select a face"+"\n")
